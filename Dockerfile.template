@@ -1,9 +1,17 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-python
 
 ARG tag=master
+ARG mjpeg_tag=master
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends libjpeg62-turbo-dev imagemagick libav-tools libv4l-dev cmake \
+  && git clone --depth=1 --branch $mjpeg_tag https://github.com/jacksonliam/mjpg-streamer.git \
+  && cd mjpg-streamer/mjpg-streamer-experimental \
+  && make \
+  && make install
 
 WORKDIR /usr/local/src
-RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /usr/local/src \
+RUN git clone --depth=1 --branch $tag https://github.com/foosel/OctoPrint.git /usr/local/src \
   && virtualenv venv \
 	&& ./venv/bin/python setup.py install
 
